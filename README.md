@@ -138,7 +138,7 @@ python -m pytest -q
 python -m ruff check .
 ```
 
-The 27 tests generate temporary images and exercise model shapes, index validation, checkpoint loading, a small training/evaluation/prediction cycle, and app startup. These validate software behavior, not plant-disease accuracy.
+The tests generate temporary images and exercise model shapes, index validation, checkpoint loading, a small training/evaluation/prediction cycle, and app startup. These validate software behavior, not plant-disease accuracy.
 
 For a manual synthetic workflow:
 

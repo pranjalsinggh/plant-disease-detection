@@ -32,6 +32,8 @@ See [the recorded benchmark JSON](index_benchmark.json). This was one local run 
 
 The Streamlit interface was inspected in a local browser. Its upload controls, missing-model state, disabled prediction button, reference taxonomy, and initial layout rendered correctly. A [preview](app-preview.jpg) is included in the README.
 
+During a follow-up live demo, a synthetic sample was uploaded and actual ranked model scores were displayed. Predictions now persist across session reruns; changing image content, removing the upload, or replacing the checkpoint clears the old result. Downloading predictions does not trigger a rerun. Three added regression tests cover these behaviors, and all five app tests passed in 4.76 seconds. The fixtures use clearly marked synthetic weights and make no disease-accuracy claims.
+
 ## Still needed for a disease model
 
 A labelled real-image dataset and a full training run are required before making disease predictions. To validate the supplied 94.03% validation and 95.94% training accuracy, retain the original dataset/splits, hyperparameters, epoch history, and trained checkpoint, then evaluate through a documented protocol. No such artifacts were available for this repository creation.

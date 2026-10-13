@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import io
 import json
 import os
@@ -68,9 +69,11 @@ def main() -> None:
         st.divider()
         st.subheader("Model status")
         predictor = None
+        checkpoint_revision = None
         if CHECKPOINT.is_file():
             try:
-                predictor = cached_predictor(str(CHECKPOINT), CHECKPOINT.stat().st_mtime_ns)
+                checkpoint_revision = CHECKPOINT.stat().st_mtime_ns
+                predictor = cached_predictor(str(CHECKPOINT), checkpoint_revision)
                 st.success("Trained checkpoint loaded")
                 st.caption(f"{len(predictor.classes)} categories · {predictor.image_size}px input")
                 if predictor.metadata.get("synthetic_images"):
@@ -114,6 +117,16 @@ def main() -> None:
                     st.image(leaf, caption="Your leaf photograph", width="stretch")
                 except (OSError, ValueError, UnidentifiedImageError, Image.DecompressionBombError) as exc:
                     st.error(f"This image could not be opened: {exc}")
+        input_key = None
+        if predictor is not None and leaf is not None:
+            input_key = (
+                str(CHECKPOINT), checkpoint_revision,
+                hashlib.sha256(uploaded.getvalue()).hexdigest(),
+            )
+        if st.session_state.get("leaf_prediction_input") != input_key:
+            st.session_state["leaf_prediction_input"] = input_key
+            st.session_state["leaf_predictions"] = None
+
         with analysis:
             st.subheader("Prediction")
             if predictor is None:
@@ -131,24 +144,28 @@ def main() -> None:
             if st.button("Analyze leaf", type="primary", disabled=predictor is None or leaf is None):
                 try:
                     with st.spinner("Inspecting leaf features…"):
-                        predictions = predictor.predict(leaf, top_k=3)
-                    crop, condition = display_label(predictions[0]["label"])
-                    st.caption(crop.upper())
-                    st.subheader(condition.capitalize())
-                    score = predictions[0]["probability"]
-                    st.metric("Model score", f"{score:.1%}")
-                    if score < 0.65:
-                        st.warning("Low model confidence. Try a clearer image and compare the alternatives.")
-                    st.caption("Scores are uncalibrated probabilities among known classes. "
-                               "The model can still be confident on an unfamiliar image.")
-                    for item in predictions:
-                        crop_name, disease = display_label(item["label"])
-                        st.write(f"**{crop_name} · {disease}** — {item['probability']:.1%}")
-                        st.progress(float(item["probability"]))
-                    st.download_button("Download prediction", json.dumps(predictions, indent=2),
-                                       file_name="leaf-prediction.json", mime="application/json")
+                        st.session_state["leaf_predictions"] = predictor.predict(leaf, top_k=3)
                 except Exception as exc:
+                    st.session_state["leaf_predictions"] = None
                     st.error(f"Prediction failed: {exc}")
+            predictions = st.session_state.get("leaf_predictions")
+            if predictions and input_key is not None:
+                crop, condition = display_label(predictions[0]["label"])
+                st.caption(crop.upper())
+                st.subheader(condition.capitalize())
+                score = predictions[0]["probability"]
+                st.metric("Model score", f"{score:.1%}")
+                if score < 0.65:
+                    st.warning("Low model confidence. Try a clearer image and compare the alternatives.")
+                st.caption("Scores are uncalibrated probabilities among known classes. "
+                           "The model can still be confident on an unfamiliar image.")
+                for item in predictions:
+                    crop_name, disease = display_label(item["label"])
+                    st.write(f"**{crop_name} · {disease}** — {item['probability']:.1%}")
+                    st.progress(float(item["probability"]))
+                st.download_button("Download prediction", json.dumps(predictions, indent=2),
+                                   file_name="leaf-prediction.json", mime="application/json",
+                                   on_click="ignore")
 
     with results:
         st.subheader("Measured results from your training run")
