@@ -1,0 +1,9 @@
+{
+  "image_size": 32,
+  "batch_size": 8,
+  "epochs": 1,
+  "learning_rate": 0.001,
+  "seed": 42,
+  "num_workers": 0,
+  "patience": 2
+}

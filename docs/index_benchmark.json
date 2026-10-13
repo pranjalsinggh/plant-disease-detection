@@ -1,0 +1,22 @@
+{
+  "benchmark_type": "synthetic_metadata_only",
+  "warning": "No images were created or decoded; this is not a real 100,000-image dataset benchmark.",
+  "database": "work/metadata-benchmark.sqlite",
+  "metadata_rows": 100000,
+  "classes": 38,
+  "image_files_created": 0,
+  "insert_seconds": 3.5739,
+  "rows_per_second": 27980.4,
+  "filtered_count_query_seconds": 0.001638,
+  "filtered_rows": 2105,
+  "query_plan": [
+    "SEARCH images USING COVERING INDEX images_split_class (split=? AND label_idx=?)"
+  ],
+  "database_bytes": 43225088,
+  "recorded_on": "2026-10-13",
+  "environment": {
+    "os": "Windows",
+    "python": "3.11",
+    "note": "Local single-run result; timings are hardware-dependent."
+  }
+}

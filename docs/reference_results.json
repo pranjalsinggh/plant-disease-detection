@@ -1,0 +1,14 @@
+{
+  "status": "user_supplied_reference_not_reproduced",
+  "source": "Project brief supplied by the repository owner",
+  "training_images_approximate": 79000,
+  "image_entry_capacity_target": 100000,
+  "categories": 38,
+  "training_accuracy_percent": 95.94,
+  "validation_accuracy_percent": 94.03,
+  "training_loss_start": 1.8891,
+  "training_loss_end": 0.1929,
+  "dataset": null,
+  "checkpoint": null,
+  "note": "No original dataset, weights, epoch history, or evaluation artifacts were supplied. These values are reference figures, not measurements from this implementation. The 100,000-entry capacity is tested separately using synthetic metadata."
+}
